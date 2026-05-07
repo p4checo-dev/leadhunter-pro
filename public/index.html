@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LeadHunter Pro | Sistema de Busca B2B</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+
+<body>
+    <div class="container">
+        <header>
+            <div class="logo">
+                <img src="logo.png" alt="LeadHunter Logo" class="site-logo">
+                <p>Encontre Conecte e Venda!</p>
+            </div>
+            <div class="actions">
+                <button class="btn" id="refresh-btn">
+                    <i class="fas fa-sync-alt"></i> Atualizar Lista
+                </button>
+            </div>
+        </header>
+
+        <section class="search-section">
+            <form id="search-form" class="search-grid">
+                <div class="input-group">
+                    <label for="nicho">Nicho de Atuação</label>
+                    <select id="nicho" required>
+                        <option value="" disabled selected>Selecione um nicho</option>
+                        <option value="Barbearia">Barbearia</option>
+                        <option value="Salão de Beleza">Salão de Beleza</option>
+                        <option value="Clínica de Estética">Clínica de Estética</option>
+                        <option value="Esmalteria">Esmalteria</option>
+                        <option value="Spa">Spa</option>
+                        <option value="Estúdio de Tatuagem">Estúdio de Tatuagem</option>
+                        <option value="Harmonização Facial">Harmonização Facial</option>
+                        <option value="Podologia">Podologia</option>
+                    </select>
+                </div>
+                <div class="input-group">
+                    <label for="estado">Estado (UF)</label>
+                    <select id="estado" required>
+                        <option value="" disabled selected>Selecione o Estado</option>
+                        <option value="AC">Acre (AC)</option>
+                        <option value="AL">Alagoas (AL)</option>
+                        <option value="AP">Amapá (AP)</option>
+                        <option value="AM">Amazonas (AM)</option>
+                        <option value="BA">Bahia (BA)</option>
+                        <option value="CE">Ceará (CE)</option>
+                        <option value="DF">Distrito Federal (DF)</option>
+                        <option value="ES">Espírito Santo (ES)</option>
+                        <option value="GO">Goiás (GO)</option>
+                        <option value="MA">Maranhão (MA)</option>
+                        <option value="MT">Mato Grosso (MT)</option>
+                        <option value="MS">Mato Grosso do Sul (MS)</option>
+                        <option value="MG">Minas Gerais (MG)</option>
+                        <option value="PA">Pará (PA)</option>
+                        <option value="PB">Paraíba (PB)</option>
+                        <option value="PR">Paraná (PR)</option>
+                        <option value="PE">Pernambuco (PE)</option>
+                        <option value="PI">Piauí (PI)</option>
+                        <option value="RJ">Rio de Janeiro (RJ)</option>
+                        <option value="RN">Rio Grande do Norte (RN)</option>
+                        <option value="RS">Rio Grande do Sul (RS)</option>
+                        <option value="RO">Rondônia (RO)</option>
+                        <option value="RR">Roraima (RR)</option>
+                        <option value="SC">Santa Catarina (SC)</option>
+                        <option value="SP">São Paulo (SP)</option>
+                        <option value="SE">Sergipe (SE)</option>
+                        <option value="TO">Tocantins (TO)</option>
+                    </select>
+                </div>
+                <div class="input-group">
+                    <label for="limit">Limite</label>
+                    <select id="limit">
+                        <option value="5">5 resultados</option>
+                        <option value="10">10 resultados</option>
+                        <option value="20" selected>20 resultados</option>
+                        <option value="50">50 resultados</option>
+                    </select>
+                </div>
+                <button type="submit" class="btn" id="search-btn">
+                    <i class="fas fa-rocket"></i> Capturar Leads
+                </button>
+            </form>
+        </section>
+
+        <div class="stats-grid">
+            <div class="stat-card">
+                <h3>Total de Leads</h3>
+                <div class="value" id="total-leads">0</div>
+            </div>
+            <div class="stat-card">
+                <h3>Novos Leads</h3>
+                <div class="value" id="new-leads" style="color: var(--success)">0</div>
+            </div>
+            <div class="stat-card">
+                <h3>Já Listados</h3>
+                <div class="value" id="listed-leads" style="color: var(--warning)">0</div>
+            </div>
+        </div>
+
+        <div id="loading" class="loading">
+            <div class="spinner"></div>
+            <h3>Buscando no Google Maps...</h3>
+            <p>Isso pode levar alguns minutos. Estamos filtrando estabelecimentos sem site.</p>
+        </div>
+
+        <div class="leads-container">
+            <div class="section-header">
+                <i class="fas fa-bolt"></i> Novos Leads (Capturados Agora)
+            </div>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Estabelecimento</th>
+                        <th>Telefone</th>
+                        <th>Endereço</th>
+                        <th>Status</th>
+                        <th>Ações</th>
+                    </tr>
+                </thead>
+                <tbody id="leads-table-body">
+                    <!-- New leads will be injected here -->
+                </tbody>
+            </table>
+        </div>
+
+        <div class="leads-container" style="margin-top: 3rem; opacity: 0.85;">
+            <div class="section-header" style="background: rgba(30, 41, 59, 0.4); color: var(--text-muted);">
+                <i class="fas fa-history"></i> Leads Antigos (Já Listados no Banco)
+            </div>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Estabelecimento</th>
+                        <th>Telefone</th>
+                        <th>Endereço</th>
+                        <th>Status</th>
+                        <th>Ações</th>
+                    </tr>
+                </thead>
+                <tbody id="old-leads-table-body">
+                    <!-- Old leads will be injected here -->
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+
+</html>

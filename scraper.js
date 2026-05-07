@@ -2,27 +2,28 @@ const { chromium } = require('playwright');
 const db = require('./database');
 
 async function scrapeGoogleMaps(query, maxResults = 20) {
-  const browser = await chromium.launch({ 
-    headless: true, 
-    args: ['--no-sandbox', '--disable-setuid-sandbox', '--disable-dev-shm-usage'] 
+  const browser = await chromium.launch({
+    headless: true,
+    args: ['--no-sandbox', '--disable-setuid-sandbox', '--disable-dev-shm-usage'],
+    executablePath: process.env.PUPPETEER_EXECUTABLE_PATH || null
   });
   const page = await browser.newPage();
-  
+
   const results = [];
-  
+
   try {
     console.log(`Searching for: ${query}`);
     await page.goto(`https://www.google.com/maps/search/${encodeURIComponent(query)}`);
-    
+
     // Wait for the results to load
     await page.waitForSelector('.m67q606yZ61__section-result-action-buttons, .hfpxzc');
 
     let processedCount = 0;
-    
+
     while (processedCount < maxResults) {
       // Find all business entries
       const entries = await page.$$('.hfpxzc');
-      
+
       if (processedCount >= entries.length) {
         // Try to scroll to load more
         await page.evaluate(() => {
@@ -41,7 +42,7 @@ async function scrapeGoogleMaps(query, maxResults = 20) {
       // Check if it has a website button in the list view (if possible)
       // Usually, if there's no website, the 'Website' button is missing.
       // However, it's more reliable to click and check details.
-      
+
       await entry.click();
       await page.waitForTimeout(1000); // Wait for details to load
 
@@ -57,18 +58,18 @@ async function scrapeGoogleMaps(query, maxResults = 20) {
           const phoneElement = document.querySelector('button[data-item-id^="phone:tel:"]');
           const phone = phoneElement ? phoneElement.getAttribute('data-item-id').replace('phone:tel:', '') : null;
           const address = document.querySelector('button[data-item-id="address"]')?.innerText || 'No address';
-          
+
           return { name, phone, address };
         });
 
         if (info.phone) {
           const status = db.isPhoneListed(info.phone) ? 'JA LISTADO' : 'NOVO';
           const result = { ...info, status, category: query };
-          
+
           if (status === 'NOVO') {
             db.addLead(result);
           }
-          
+
           results.push(result);
           console.log(`Found Lead: ${info.name} - ${info.phone} [${status}]`);
         }
@@ -79,7 +80,7 @@ async function scrapeGoogleMaps(query, maxResults = 20) {
   } finally {
     await browser.close();
   }
-  
+
   return results;
 }
 

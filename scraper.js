@@ -2,7 +2,10 @@ const { chromium } = require('playwright');
 const db = require('./database');
 
 async function scrapeGoogleMaps(query, maxResults = 20) {
-  const browser = await chromium.launch({ headless: false }); // Headless false so user can see it working if they want, or for debugging
+  const browser = await chromium.launch({ 
+    headless: true, 
+    args: ['--no-sandbox', '--disable-setuid-sandbox', '--disable-dev-shm-usage'] 
+  });
   const page = await browser.newPage();
   
   const results = [];

@@ -5,7 +5,7 @@ const db = require('./database');
 const path = require('path');
 
 const app = express();
-const PORT = process.env.PORT || 3000;
+const PORT = process.env.PORT || 10000;
 
 app.use(cors());
 app.use(express.json());
@@ -19,7 +19,7 @@ app.get('/api/leads', (req, res) => {
 app.post('/api/search', async (req, res) => {
   const { query, limit } = req.body;
   if (!query) return res.status(400).json({ error: 'Query is required' });
-  
+
   try {
     const results = await scrapeGoogleMaps(query, limit || 20);
     res.json(results);
@@ -28,6 +28,6 @@ app.post('/api/search', async (req, res) => {
   }
 });
 
-app.listen(PORT, () => {
-  console.log(`Server running at http://localhost:${PORT}`);
+app.listen(PORT, '0.0.0.0', () => {
+  console.log(`Server running on port ${PORT}`);
 });
